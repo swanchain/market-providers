@@ -5,6 +5,6 @@
 As a resource provider, you can run a ECP(Edge Computing Provider) and FCP(Fog Computing Provider) to contribute yourcomputing resource. More details can be found [here](https://github.com/swanchain/go-computing-provider)
 
 ## Computing Provider Account(cpAccount)
-The computing provider has upgraded to V2, one CP will be a `cpAccount` contract on the Swan chain, any users can found the CP account informations from the Swan chain. The CP account contract file can be found here:
+The computing provider has upgraded to V2, one CP will be a `cpAccount` contract on the Swan chain, And when a CP is initialized, the cpAccount will be registered to the `RegistryContract`. Any user can found the CP account informations by the `RegistryContract` from the Swan chain.  The related contract files can be found here:
  - [cpAccount.sol](account/cpAccount.sol)
- -  
+ - [ContractRegistry.sol](account/ContractRegistry.sol)
