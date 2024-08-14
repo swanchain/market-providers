@@ -9,10 +9,23 @@ The computing provider has upgraded to V2, one CP will be a `cpAccount` contract
  - [cpAccount.sol](account/cpAccount.sol)
  - [ContractRegistry.sol](account/ContractRegistry.sol)
 
-## Latest Version
+## Network and Version
 
 - **Swan Mainnet**
-    - Registry contract Address: `0xbef1ec33e5Ac3a491fFeE1600e0b00eac97cb138` 
+
+| Item                             | Details                                                                 |
+|----------------------------------|-------------------------------------------------------------------------|
+| Currency Symbol                  | sETH                                                                    |
+| Chain ID                         | 254                                                                     |
+| RPC URL                          | [https://mainnet-rpc01.swanchain.io](https://mainnet-rpc01.swanchain.io), [https://swanscan.io](https://swanscan.io) |
+| Swan Credits Token Symbol        | SWANC                                                                   |
+| SwanETH Bridge                   | [https://bridge.swanchain.io](https://bridge.swanchain.io)              |
+| SWANC Claim Page                 | [https://faucet.swanchain.io](https://faucet.swanchain.io)              |
+| Block Explorer URL               | [https://mainnet-explorer.swanchain.io](https://mainnet-explorer.swanchain.io) |
+| Swan Provider Dashboard          | [https://orchestrator.swanchain.io/provider-status](https://orchestrator.swanchain.io/provider-status)|
+| Swan Credits Token               | 0xAF90ac6428775E1Be06BAFA932c2d80119a7bd02                              |
+| **CP Account Register Contract** | 0xbef1ec33e5Ac3a491fFeE1600e0b00eac97cb138                              |
+
 
 - **Proxima Testnet**
     - Registry contract Address: `0x6EDf891B53ba2c6Fade6Ae373682ED48dEa5AF48`
