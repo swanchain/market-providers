@@ -20,6 +20,7 @@
 
 ### Workflow
 
+<img src="zk-engine-flowchart.png" width="100%">
 
 ## Network and Version
 
