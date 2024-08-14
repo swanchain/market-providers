@@ -9,10 +9,32 @@ The computing provider has upgraded to V2, one CP will be a `cpAccount` contract
  - [cpAccount.sol](account/cpAccount.sol)
  - [ContractRegistry.sol](account/ContractRegistry.sol)
 
-## Latest Version
+## Network and Version
 
 - **Swan Mainnet**
-    - Registry contract Address: `0xbef1ec33e5Ac3a491fFeE1600e0b00eac97cb138` 
+
+| Item                          | Details                                                                 |
+|-------------------------------|-------------------------------------------------------------------------|
+| Currency Symbol               | sETH                                                                    |
+| Chain ID                      | 254                                                                     |
+| RPC URL                       | [https://mainnet-rpc01.swanchain.io](https://mainnet-rpc01.swanchain.io), [https://swanscan.io](https://swanscan.io) |
+| Swan Credits Token Symbol     | SWANC                                                                   |
+| SwanETH Bridge                | [https://bridge.swanchain.io](https://bridge.swanchain.io)              |
+| SWANC Claim Page              | [https://faucet.swanchain.io](https://faucet.swanchain.io)              |
+| Block Explorer URL            | [https://mainnet-explorer.swanchain.io](https://mainnet-explorer.swanchain.io) |
+| Swan Provider Dashboard| [https://orchestrator.swanchain.io/provider-status](https://orchestrator.swanchain.io/provider-status)|
+| Swan Credits Token            | 0xAF90ac6428775E1Be06BAFA932c2d80119a7bd02                              |
+| Collateral Contract for FCP   | 0x48966A3eb8C1b584Ac9E7767bC9607e235245C81                              |
+| CP Account Register Contract  | 0xbef1ec33e5Ac3a491fFeE1600e0b00eac97cb138                              |
+| ZK Task Register Contract     | 0x4Cd9b2450c3e412a1F0F0aE78C79271337241E31                              |                           
+| ECP Collateral Contract       | 0x0b84cc9CcE1459c85337b511872528cE947C3962                              |                             
+| ZK engine Publick Key         | 0xB5aeb540B4895cd024c1625E146684940A849ED9                              |
+| ZK-engine reward address      | 0xC2EF272e14a7A222eA909bBB6C5ffdb9B2EFAC02                              |
+| Sequencer Contract            | 0xE0a88F1fA56D8a8D73E9bb9Fc03506439cb386Bd                              |                            
+| Collateral for ECP            | 100 SWANC/Period Tasks                                                  |
+| Gas to Sequencer              | 0.00001 sETH/task                                                       |
+| Sequencer Blob Period         | 24 Hours                                                                |
+
 
 - **Proxima Testnet**
     - Registry contract Address: `0x6EDf891B53ba2c6Fade6Ae373682ED48dEa5AF48`
