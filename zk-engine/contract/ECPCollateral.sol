@@ -48,8 +48,9 @@ contract ECPCollateral is Ownable {
     event CollateralAdjusted(address indexed cp, uint frozenAmount, uint balanceAmount, string operation);
     event DisputeProof(address indexed challenger, address indexed taskContractAddress, address cpAccount, uint taskID);
     event WithdrawRequested(address indexed cp, uint amount);
-    event WithdrawConfirmed(address indexed cp, uint amount);
+    event WithdrawConfirmed(address indexed cp, address cpOwner, uint amount);
     event WithdrawRequestCanceled(address indexed cp, uint amount);
+    event BatchFrozenDeposit(address indexed admin, address[] cps, uint[] amounts);
 
     constructor() Ownable(msg.sender) {
         _transferOwnership(msg.sender);
@@ -123,6 +124,20 @@ contract ECPCollateral is Ownable {
         }
     }
 
+    function batchFrozenDeposit(address[] calldata cps, uint[] calldata amounts) external onlyAdmin {
+        require(cps.length == amounts.length, "Array lengths must match");
+        uint totalAmount = 0;
+        for (uint i = 0; i < amounts.length; i++) {
+            totalAmount += amounts[i];
+        }
+        require(collateralToken.transferFrom(msg.sender, address(this), totalAmount), "Token transfer failed");
+        for (uint i = 0; i < cps.length; i++) {
+            frozenBalance[cps[i]] += amounts[i];
+            checkCpInfo(cps[i]);
+        }
+        emit BatchFrozenDeposit(msg.sender, cps, amounts);
+    }
+
     function disputeProof(address taskContractAddress, address cpAccount, uint taskID) public {
         emit DisputeProof(msg.sender, taskContractAddress, cpAccount, taskID);
     }
@@ -156,9 +171,9 @@ contract ECPCollateral is Ownable {
 
         uint withdrawAmount = request.amount;
         frozenBalance[cpAccount] -= withdrawAmount;
-        collateralToken.transfer(cpAccount, withdrawAmount);
+        collateralToken.transfer(cpOwner, withdrawAmount);
 
-        emit WithdrawConfirmed(cpAccount, withdrawAmount);
+        emit WithdrawConfirmed(cpAccount, cpOwner, withdrawAmount);
 
         delete withdrawRequests[cpAccount];
     }
@@ -258,5 +273,4 @@ contract ECPCollateral is Ownable {
         collateralToken.transfer(msg.sender, slashfund);
         emit WithdrawSlash(msg.sender, slashfund);
     }
-
 }
