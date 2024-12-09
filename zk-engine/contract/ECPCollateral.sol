@@ -10,7 +10,7 @@ contract ECPCollateral is Ownable {
     uint public baseCollateral;
     uint public collateralRatio;
     uint public slashRatio;
-    uint public withdrawDelay = 34560; 
+    uint public withdrawDelay = 120960;
 
     mapping(address => bool) public isAdmin;
     mapping(address => int) public balances;
@@ -19,7 +19,7 @@ contract ECPCollateral is Ownable {
     mapping(address => WithdrawRequest) public withdrawRequests;
 
     struct ContractInfo {
-        address collateralToken; 
+        address collateralToken;
         uint slashedFunds;
         uint baseCollateral;
         uint collateralRatio;
@@ -73,6 +73,7 @@ contract ECPCollateral is Ownable {
     }
 
     function lockCollateral(address cp, uint taskCollateral) public onlyAdmin {
+        require(cp != address(0), "Invalid address: cp cannot be the zero address");
         require(balances[cp] >= int(taskCollateral), "Not enough balance for collateral");
         balances[cp] -= int(taskCollateral);
         frozenBalance[cp] += taskCollateral;
@@ -81,6 +82,7 @@ contract ECPCollateral is Ownable {
     }
 
     function unlockCollateral(address cp, uint taskCollateral) public onlyAdmin {
+        require(cp != address(0), "Invalid address: cp cannot be the zero address");
         uint availableAmount = frozenBalance[cp];
         uint unlockAmount = taskCollateral > availableAmount ? availableAmount : taskCollateral;
 
@@ -91,14 +93,22 @@ contract ECPCollateral is Ownable {
     }
 
     function slashCollateral(address cp, uint slashAmount) public onlyAdmin {
+        require(cp != address(0), "Invalid address: cp cannot be the zero address");
+        require(slashAmount > 0, "Invalid amount: slashAmount must be greater than zero");
         uint availableFrozen = frozenBalance[cp];
+        uint availableBalance = balances[cp] > 0 ? uint(balances[cp]) : 0;
+
         uint fromFrozen = slashAmount > availableFrozen ? availableFrozen : slashAmount;
-        uint fromBalance = slashAmount > fromFrozen ? slashAmount - fromFrozen : 0;
+        uint remainingToSlash = slashAmount > fromFrozen ? slashAmount - fromFrozen : 0;
+        uint fromBalance = remainingToSlash > availableBalance ? availableBalance : remainingToSlash;
+        uint actualSlashed = fromFrozen + fromBalance;
         frozenBalance[cp] -= fromFrozen;
-        balances[cp] -= int(fromBalance);
-        slashedFunds += slashAmount;
+        balances[cp] -= int(remainingToSlash);
+
+
+        slashedFunds += actualSlashed;
         checkCpInfo(cp);
-        emit CollateralSlashed(cp, slashAmount);
+        emit CollateralSlashed(cp, actualSlashed);
         emit CollateralAdjusted(cp, fromFrozen, fromBalance, "Slashed");
     }
 
@@ -106,6 +116,7 @@ contract ECPCollateral is Ownable {
         require(cps.length == taskCollaterals.length, "Array lengths must match");
 
         for (uint i = 0; i < cps.length; i++) {
+            require(cps[i] != address(0), "Invalid address: cp cannot be the zero address");
             lockCollateral(cps[i], taskCollaterals[i]);
         }
     }
@@ -113,6 +124,7 @@ contract ECPCollateral is Ownable {
     function batchUnlock(address[] calldata cps, uint[] calldata taskCollaterals) external onlyAdmin {
         require(cps.length == taskCollaterals.length, "Array lengths must match");
         for (uint i = 0; i < cps.length; i++) {
+            require(cps[i] != address(0), "Invalid address: cp cannot be the zero address");
             unlockCollateral(cps[i], taskCollaterals[i]);
         }
     }
@@ -120,6 +132,7 @@ contract ECPCollateral is Ownable {
     function batchSlash(address[] calldata cps, uint[] calldata slashAmounts) external onlyAdmin {
         require(cps.length == slashAmounts.length, "Array lengths must match");
         for (uint i = 0; i < cps.length; i++) {
+            require(cps[i] != address(0), "Invalid address: cp cannot be the zero address");
             slashCollateral(cps[i], slashAmounts[i]);
         }
     }
@@ -132,6 +145,7 @@ contract ECPCollateral is Ownable {
         }
         require(collateralToken.transferFrom(msg.sender, address(this), totalAmount), "Token transfer failed");
         for (uint i = 0; i < cps.length; i++) {
+            require(cps[i] != address(0), "Invalid address: cp cannot be the zero address");
             frozenBalance[cps[i]] += amounts[i];
             checkCpInfo(cps[i]);
         }
@@ -139,10 +153,13 @@ contract ECPCollateral is Ownable {
     }
 
     function disputeProof(address taskContractAddress, address cpAccount, uint taskID) public {
+        require(cpAccount != address(0), "Invalid address: cpAccount cannot be the zero address");
+        require(taskContractAddress != address(0), "Invalid address: taskContract cannot be the zero address");
         emit DisputeProof(msg.sender, taskContractAddress, cpAccount, taskID);
     }
 
     function requestWithdraw(address cpAccount, uint amount) public {
+        require(cpAccount != address(0), "Invalid address: cpAccount cannot be the zero address");
         (bool success, bytes memory CPOwner) = cpAccount.call(abi.encodeWithSignature("getOwner()"));
         require(success, "Failed to call getOwner function of CPAccount");
         address cpOwner = abi.decode(CPOwner, (address));
@@ -159,6 +176,7 @@ contract ECPCollateral is Ownable {
     }
 
     function confirmWithdraw(address cpAccount) public {
+        require(cpAccount != address(0), "Invalid address: cpAccount cannot be the zero address");
         (bool success, bytes memory CPOwner) = cpAccount.call(abi.encodeWithSignature("getOwner()"));
         require(success, "Failed to call getOwner function of CPAccount");
         address cpOwner = abi.decode(CPOwner, (address));
@@ -179,6 +197,7 @@ contract ECPCollateral is Ownable {
     }
 
     function cancelWithdrawRequest(address cpAccount) public {
+        require(cpAccount != address(0), "Invalid address: cpAccount cannot be the zero address");
         (bool success, bytes memory CPOwner) = cpAccount.call(abi.encodeWithSignature("getOwner()"));
         require(success, "Failed to call getOwner function of CPAccount");
         address cpOwner = abi.decode(CPOwner, (address));
@@ -192,10 +211,13 @@ contract ECPCollateral is Ownable {
         delete withdrawRequests[cpAccount];
     }
     function viewWithdrawRequest(address cpAccount) external view returns (WithdrawRequest memory) {
+        require(cpAccount != address(0), "Invalid address: cpAccount cannot be the zero address");
         return withdrawRequests[cpAccount];
     }
 
     function deposit(address cpAccount, uint amount) public {
+        require(cpAccount != address(0), "Invalid address: cpAccount cannot be the zero address");
+        require(amount > 0, "Invalid amount: must be greater than zero");
         collateralToken.transferFrom(msg.sender, address(this), amount);
         balances[cpAccount] += int(amount);
         emit Deposit(msg.sender, cpAccount, amount);
@@ -203,6 +225,7 @@ contract ECPCollateral is Ownable {
     }
 
     function withdraw(address cpAccount, uint amount) external {
+        require(cpAccount != address(0), "Invalid address: cpAccount cannot be the zero address");
         (bool success, bytes memory CPOwner) = cpAccount.call(abi.encodeWithSignature("getOwner()"));
         require(success, "Failed to call getOwner function of CPAccount");
         address cpOwner = abi.decode(CPOwner, (address));
@@ -227,6 +250,7 @@ contract ECPCollateral is Ownable {
     }
 
     function setCollateralToken(address tokenAddress) external onlyOwner {
+        require(tokenAddress != address(0), "Invalid address: tokenAddress cannot be the zero address");
         collateralToken = IERC20(tokenAddress);
     }
 
@@ -250,7 +274,8 @@ contract ECPCollateral is Ownable {
         return baseCollateral;
     }
 
-        function cpInfo(address cpAccount) external view returns (CPInfo memory) {
+    function cpInfo(address cpAccount) external view returns (CPInfo memory) {
+        require(cpAccount != address(0), "Invalid address: cpAccount cannot be the zero address");
         return CPInfo({
             cp: cpAccount,
             balance: balances[cpAccount],
@@ -260,6 +285,7 @@ contract ECPCollateral is Ownable {
     }
 
     function checkCpInfo(address cpAccount) internal {
+        require(cpAccount != address(0), "Invalid address: cpAccount cannot be the zero address");
         if (balances[cpAccount] == 0 && frozenBalance[cpAccount] == 0) {
             cpStatus[cpAccount] = "NSC";
         } else {
