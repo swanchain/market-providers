@@ -48,12 +48,6 @@ contract CPAccount {
         _;
     }
 
-    modifier ownerAndWorker() {
-        require(msg.sender == owner|| msg.sender == worker, "owner and worker can call this function.");
-        _;
-    }
-
-
     function registerToContractRegistry() private {
         // Call registerCPContract function of ContractRegistry
         (bool success, ) = contractRegistryAddress.call(abi.encodeWithSignature("registerCPContract(address,address)", address(this), owner));
