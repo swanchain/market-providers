@@ -44,6 +44,7 @@ contract ZKSequencer is Ownable {
     }
 
     function withdraw(address cpAccount, uint256 amount) external {
+        require(cpAccount != address(0), "Invalid address: cpAccout cannot be the zero address");
         (bool success, bytes memory CPOwner) = cpAccount.call(abi.encodeWithSignature("getOwner()"));
         require(success, "Failed to call getOwner function of CPAccount");
         address cpOwner = abi.decode(CPOwner, (address));
@@ -55,6 +56,7 @@ contract ZKSequencer is Ownable {
     }
 
     function transferToEscrow(address cpAccount, uint256 amount) external onlyAdminOrOwner {
+        require(cpAccount != address(0), "Invalid address: cpAccount cannot be the zero address");
         balances[cpAccount] -= int(amount);
         escrowBalance += amount;
         emit TransferredToEscrow(cpAccount, amount);
@@ -68,6 +70,7 @@ contract ZKSequencer is Ownable {
     function batchTransferToEscrow(address[] calldata cpAccounts, uint256[] calldata amounts) external onlyAdminOrOwner {
         require(cpAccounts.length == amounts.length, "Arrays length mismatch");
         for (uint i = 0; i < cpAccounts.length; i++) {
+            require(cpAccounts[i] != address(0), "Invalid address: cpAccount cannot be the zero address");
             balances[cpAccounts[i]] -= int(amounts[i]);
             escrowBalance += amounts[i];
             emit TransferredToEscrow(cpAccounts[i], amounts[i]);
